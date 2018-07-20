@@ -38,6 +38,7 @@ for (let i = 1; i <= 100; i++) {
         agreeMark2: faker.random.boolean(),
         agreeMark3: faker.random.boolean(),
         agreeMark4: faker.random.boolean(),
+        serverLastEditedDate: faker.date.recent(5).getTime()
     });
 }
 
