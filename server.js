@@ -72,10 +72,20 @@ server.post('/photos', upload.single('file'),  (req, res) => {
     // res.status(500).json({
     //     message: "Błąd przetwarzaia zdjęcia"
     // });
+
     // albo oryginał przed chwilą przesłany
-    res.status(200).sendFile('uploads/' + req.file.originalname, { "root": __dirname });
+    //res.status(200).sendFile('uploads/' + req.file.originalname, { "root": __dirname });
+
+    //albo testową miniaturkę
+    res.status(200).sendFile('thumbnail.jpg', { "root": __dirname });
 });
 
+// obsługa downloadu, na prawdziwym serwerze zwróci miniaturę po
+server.get('/photos/:photoid', (req, res) => {
+    res.status(200).sendFile('thumbnail.jpg', { "root": __dirname });
+});
+
+// testowy błąd konfliktu na człowieku
 server.patch('/people/1', (req, res) => {
     res.status(409).json({
         message: "Błąd zapisu. Konflikt danych."
