@@ -4,12 +4,24 @@ const router = jsonServer.router('db.json')
 const middlewares = jsonServer.defaults();
 const cors = require('cors');
 
+//JWT
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 const SECRET_KEY = '123456789';
 const expiresIn = '1h';
-
-const fs = require('fs');
 const userdb = JSON.parse(fs.readFileSync('./users.json', 'UTF-8'));
+
+// multipart/form-data
+var multer = require('multer');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+})
+var upload = multer({ storage: storage })
 
 server.use(jsonServer.bodyParser);
 server.use(cors({ origin: 'http://localhost:8100' }));
@@ -31,7 +43,7 @@ server.post('/auth/login', (req, res) => {
     res.status(200).json({ access_token });
 });
 
-// łąpie inne ściezki niż logowanie, i jeżeli nie zgadza się token, to zwraca błąd 401
+// łapie inne ściezki niż logowanie, i jeżeli nie zgadza się token, to zwraca błąd 401
 server.use(/^(?!\/auth).*$/, (req, res, next) => { // regex co łapie wszystko inne niż '/auth'; Negative Lookahead
     if (req.headers.authorization === undefined || req.headers.authorization.split(' ')[0] !== 'Bearer') {
         const status = 401;
@@ -49,14 +61,26 @@ server.use(/^(?!\/auth).*$/, (req, res, next) => { // regex co łapie wszystko i
     }
 });
 
+// obsługa uploadu, na prawdziwym serwerze zwróci miniaturę
+server.post('/photos', upload.single('file'),  (req, res) => {
+    console.log("File:", req.file);
+    console.log("Body:", req.body);
 
+    // odkomentować jedno z poniższych
+
+    // tutaj zwraca albo błąd
+    // res.status(500).json({
+    //     message: "Błąd przetwarzaia zdjęcia"
+    // });
+    // albo oryginał przed chwilą przesłany
+    res.status(200).sendFile('uploads/' + req.file.originalname, { "root": __dirname });
+});
 
 server.patch('/people/1', (req, res) => {
     res.status(409).json({
         message: "Błąd zapisu. Konflikt danych."
     });
 });
-
 
 server.use(middlewares)
 server.use(router)
