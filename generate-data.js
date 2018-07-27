@@ -1,7 +1,11 @@
 const faker = require('faker');
 const fs = require('fs');
 
-let database = { people: [] };
+let database = {
+    people: [],
+    offices: [],
+    events: []
+};
 faker.locale = 'pl';
 faker.seed(5542742864); // żeby zawsze zwracał te same rezultaty
 
@@ -39,6 +43,53 @@ for (let i = 1; i <= 100; i++) {
         agreeMark3: faker.random.boolean(),
         agreeMark4: faker.random.boolean(),
         serverLastEditedDate: faker.date.recent(5).getTime()
+    });
+}
+
+for (let i = 1; i <= 100; i++) {
+    database.offices.push({
+        id: i,
+        name: faker.company.companyName(),
+        street: faker.address.streetName(),
+        buildingNo: faker.random.number(100).toString(),
+        localNo: faker.random.number(100).toString(),
+        postal: faker.address.zipCode("##-###"),
+        city: faker.address.city(),
+        county: faker.address.county(),
+        serverLastEditedDate: faker.date.recent(5).getTime()
+    });
+}
+
+for (let i = 1; i <= 20; i++) {
+    const randomOffice = database.offices[faker.random.number({ min: 0, max: database.offices.length -1 })];
+    const randomPeople = [];
+    for (let i = 1; i <= 4; i++) {
+        randomPeople.push(database.people[faker.random.number({ min: 0, max: database.offices.length - 1 })]);
+    }
+
+    database.events.push({
+        id: i,
+        name: faker.company.companyName(),
+        date: faker.date.recent(),
+        photoOutside: null,
+        photoInsideWaiting: null,
+        noPhotoInsideWaiting: faker.random.boolean(),
+        noPhotoInsideWaitingWhy: faker.random.words(5),
+        photoInsideOffice: null,
+        noPhotoInsideOffice: faker.random.boolean(),
+        noPhotoInsideOfficeWhy: faker.random.words(5),
+        isOfficeNetwork: faker.random.boolean(),
+        networkOfficesCount: faker.random.number(10),
+        chairsCount: faker.random.number(10),
+        doctorsCount: faker.random.number(10),
+        hasOfficeHigienists: faker.random.boolean(),
+        higienistsCount: faker.random.number(10),
+        isBuyingSonicare: faker.random.arrayElement(['no', 'yes', 'yes_sell']),
+        doQualify: faker.random.arrayElement(['no', 'no_deny', 'yes']),
+        serverLastEditedDate: faker.date.recent(5).getTime(),
+
+        office: randomOffice,
+        people: randomPeople
     });
 }
 
